@@ -28,6 +28,9 @@ class MessageModel {
   //是否展示创建时间
   bool showCreatedTime;
 
+  //是否为最后一条消息
+  bool isLast;
+
   MessageModel(
       {this.id,
       this.ownerName,
@@ -35,7 +38,8 @@ class MessageModel {
       this.avatar,
       required this.content,
       required this.createdAt,
-      this.showCreatedTime = false})
+      this.showCreatedTime = false,
+      this.isLast = false})
       : key = GlobalKey();
 
   factory MessageModel.fromJson(Map<String, dynamic> json) => MessageModel(

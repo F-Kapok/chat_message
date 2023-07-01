@@ -79,13 +79,18 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     chatController = ChatController(
         initialMessageList: _messageList,
         scrollController: ScrollController(),
         messageWidgetBuilder: null,
         timePellet: 60);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    chatController.dispose();
   }
 
   @override
@@ -144,7 +149,8 @@ class _MyHomePageState extends State<MyHomePage> {
           content: 'chatGpt是由OpenAi研发的连天机器人程序',
           createdAt: DateTime.now().millisecondsSinceEpoch,
           avatar: 'https://o.devio.org/images/o_as/avatar/tx2.jpeg',
-          ownerName: 'ChatGPT'));
+          ownerName: 'ChatGPT',
+          isLast: true));
     });
   }
 

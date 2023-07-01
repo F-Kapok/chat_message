@@ -1,5 +1,6 @@
 import 'package:bubble/bubble.dart';
 import 'package:chat_message/models/message_model.dart';
+import 'package:chat_message/utils/TextTween.dart';
 import 'package:chat_message/utils/wechat_date_format.dart';
 import 'package:flutter/material.dart';
 
@@ -7,7 +8,7 @@ typedef MessageWidgetBuilder = Widget Function(MessageModel message);
 typedef OnBubbleClick = void Function(
     MessageModel message, BuildContext ancestor);
 
-class DefaultMessageWidget extends StatelessWidget {
+class DefaultMessageWidget extends StatefulWidget {
   final MessageModel message;
   final String? fontFamily;
   final double fontSize;
@@ -33,13 +34,25 @@ class DefaultMessageWidget extends StatelessWidget {
       this.onPress})
       : super(key: key);
 
+  @override
+  State<DefaultMessageWidget> createState() => _DefaultMessageWidgetState();
+}
+
+class _DefaultMessageWidgetState extends State<DefaultMessageWidget>
+    with SingleTickerProviderStateMixin {
+  /// 持续时间为10秒的动画控制器
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 888),
+  )..forward();
+
   Widget get _buildCircleAvatar {
-    var child = message.avatar is String
+    var child = widget.message.avatar is String
         ? ClipOval(
             child: Image.network(
-              message.avatar!,
-              height: avatarSize,
-              width: avatarSize,
+              widget.message.avatar!,
+              height: widget.avatarSize,
+              width: widget.avatarSize,
             ),
           )
         : CircleAvatar(
@@ -53,26 +66,28 @@ class DefaultMessageWidget extends StatelessWidget {
   }
 
   String get senderInitials {
-    if (message.ownerName == null) return "";
-    List<String> chars = message.ownerName!.split(" ");
+    if (widget.message.ownerName == null) return "";
+    List<String> chars = widget.message.ownerName!.split(" ");
     if (chars.length == 1) {
       return chars[0];
     } else {
-      return message.ownerName![0];
+      return widget.message.ownerName![0];
     }
   }
 
-  double? get contentMargin => avatarSize + 10;
+  double? get contentMargin => widget.avatarSize + 10;
 
   @override
   Widget build(BuildContext context) {
-    if (messageWidget != null) return messageWidget!(message);
-    Widget content = message.ownerType == OwnerType.receiver
+    if (widget.messageWidget != null) {
+      return widget.messageWidget!(widget.message);
+    }
+    Widget content = widget.message.ownerType == OwnerType.receiver
         ? _buildReceiver(context)
         : _buildSender(context);
     return Column(
       children: [
-        if (message.showCreatedTime) _buildCreatedTime(),
+        if (widget.message.showCreatedTime) _buildCreatedTime(),
         const Padding(padding: EdgeInsets.only(top: 10)),
         content
       ],
@@ -92,7 +107,8 @@ class DefaultMessageWidget extends StatelessWidget {
           alignment: Alignment.topLeft,
           stick: true,
           nip: BubbleNip.leftTop,
-          color: backgroundColor ?? const Color.fromRGBO(233, 233, 252, 19),
+          color:
+              widget.backgroundColor ?? const Color.fromRGBO(233, 233, 252, 19),
           child: _buildContentText(TextAlign.left, context),
         ))
       ],
@@ -111,7 +127,7 @@ class DefaultMessageWidget extends StatelessWidget {
           alignment: Alignment.topRight,
           stick: true,
           nip: BubbleNip.rightTop,
-          color: backgroundColor ?? Colors.white,
+          color: widget.backgroundColor ?? Colors.white,
           child: _buildContentText(TextAlign.left, context),
         )),
         _buildCircleAvatar,
@@ -120,22 +136,33 @@ class DefaultMessageWidget extends StatelessWidget {
   }
 
   _buildContentText(TextAlign align, BuildContext context) {
-    return InkWell(
-      onTap: () => onTap != null ? onTap!(message, context) : null,
-      onLongPress: () => onPress != null ? onPress!(message, context) : null,
-      child: Text(
-        message.content,
-        textAlign: align,
-        style: TextStyle(
-            fontSize: fontSize,
-            color: textColor ?? Colors.black,
-            fontFamily: fontFamily),
-      ),
-    );
+    late final Animation<String> animation =
+        TextTween(end: widget.message.content).animate(_controller);
+    return AnimatedBuilder(
+        animation: animation,
+        builder: (BuildContext context, Widget? child) {
+          return InkWell(
+            onTap: () => widget.onTap != null
+                ? widget.onTap!(widget.message, context)
+                : null,
+            onLongPress: () => widget.onPress != null
+                ? widget.onPress!(widget.message, context)
+                : null,
+            child: Text(
+              widget.message.isLast ? animation.value : widget.message.content,
+              textAlign: align,
+              style: TextStyle(
+                  fontSize: widget.fontSize,
+                  color: widget.textColor ?? Colors.black,
+                  fontFamily: widget.fontFamily),
+            ),
+          );
+        });
   }
 
   _buildCreatedTime() {
-    String showT = WechatDateFormat.format(message.createdAt, dayOnly: false);
+    String showT =
+        WechatDateFormat.format(widget.message.createdAt, dayOnly: false);
     return Container(
       padding: const EdgeInsets.only(top: 10),
       child: Text(showT),
