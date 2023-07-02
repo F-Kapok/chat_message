@@ -1,6 +1,6 @@
 name: chat_message
 description: A Flutter package that allows you to integrate Chat View with highly customization options such as one on one chat.
-version: 1.0.0
+version: 1.0.1
 repository: https://github.com/F-Kapok/chat_message
 documentation: https://github.com/F-Kapok/chat_message/blob/main/README.md
 issue_tracker: https://github.com/F-Kapok/chat_message/issues

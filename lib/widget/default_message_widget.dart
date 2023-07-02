@@ -168,4 +168,10 @@ class _DefaultMessageWidgetState extends State<DefaultMessageWidget>
       child: Text(showT),
     );
   }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controller.dispose();
+  }
 }
