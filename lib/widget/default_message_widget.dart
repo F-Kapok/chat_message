@@ -15,6 +15,7 @@ class DefaultMessageWidget extends StatefulWidget {
   final double avatarSize;
   final Color? textColor;
   final Color? backgroundColor;
+  final Duration duration;
 
   final MessageWidgetBuilder? messageWidget;
 
@@ -24,6 +25,7 @@ class DefaultMessageWidget extends StatefulWidget {
   const DefaultMessageWidget(
       {required GlobalKey key,
       required this.message,
+      required this.duration,
       this.fontFamily,
       this.fontSize = 16,
       this.avatarSize = 40,
@@ -43,7 +45,7 @@ class _DefaultMessageWidgetState extends State<DefaultMessageWidget>
   /// 持续时间为10秒的动画控制器
   late final AnimationController _controller = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 888),
+    duration: widget.duration,
   )..forward();
 
   Widget get _buildCircleAvatar {

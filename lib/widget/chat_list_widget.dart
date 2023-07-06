@@ -45,6 +45,7 @@ class _ChatListState extends State<ChatList> {
                   return DefaultMessageWidget(
                     key: model.key,
                     message: model,
+                    duration: Duration(milliseconds: model.content.length * 80),
                     onTap: widget.onTap,
                     onPress: widget.onPress,
                     messageWidget: messageWidgetBuilder,
